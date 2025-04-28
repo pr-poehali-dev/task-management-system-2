@@ -63,7 +63,11 @@ const emptyTask: TaskFormData = {
 };
 
 const Index = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    return savedTasks ? JSON.parse(savedTasks) : initialTasks;
+  });
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<TaskFormData>(emptyTask);
   const [isEditing, setIsEditing] = useState(false);
@@ -76,6 +80,11 @@ const Index = () => {
       navigate("/login");
     }
   }, [navigate]);
+
+  // Сохраняем задачи в localStorage при изменении
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const handleAddTask = () => {
     setCurrentTask(emptyTask);

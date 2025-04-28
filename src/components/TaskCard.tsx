@@ -1,10 +1,11 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Clock, Edit, Trash2 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Check, ClipboardList, Clock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-export type TaskPriority = "низкий" | "средний" | "высокий";
 export type TaskStatus = "новая" | "в процессе" | "завершена";
+export type TaskPriority = "низкий" | "средний" | "высокий";
 
 export interface Task {
   id: string;
@@ -22,75 +23,118 @@ interface TaskCardProps {
   onStatusChange: (id: string, status: TaskStatus) => void;
 }
 
-const getPriorityColor = (priority: TaskPriority) => {
-  switch (priority) {
-    case "низкий":
-      return "bg-blue-100 text-blue-800";
-    case "средний":
-      return "bg-yellow-100 text-yellow-800";
-    case "высокий":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const getStatusColor = (status: TaskStatus) => {
-  switch (status) {
-    case "новая":
-      return "bg-purple-100 text-purple-800";
-    case "в процессе":
-      return "bg-amber-100 text-amber-800";
-    case "завершена":
-      return "bg-green-100 text-green-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
 const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
-  const nextStatus = (): TaskStatus => {
-    if (task.status === "новая") return "в процессе";
-    if (task.status === "в процессе") return "завершена";
-    return "новая";
+  const getPriorityColor = (priority: string) => {
+    switch(priority) {
+      case "высокий": return "bg-red-100 text-red-700 hover:bg-red-200";
+      case "средний": return "bg-amber-100 text-amber-700 hover:bg-amber-200";
+      case "низкий": return "bg-blue-100 text-blue-700 hover:bg-blue-200";
+      default: return "bg-gray-100 text-gray-700 hover:bg-gray-200";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case "завершена": return "text-green-500";
+      case "в процессе": return "text-amber-500";
+      case "новая": return "text-blue-500";
+      default: return "text-gray-500";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case "завершена": return <Check className="h-4 w-4" />;
+      case "в процессе": return <Clock className="h-4 w-4" />;
+      case "новая": return <ClipboardList className="h-4 w-4" />;
+      default: return <ClipboardList className="h-4 w-4" />;
+    }
   };
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md">
-      <CardHeader className="p-4 pb-2">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-medium">{task.title}</CardTitle>
-          <div className="flex gap-1">
-            <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
-            <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
-          </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <CardTitle className="text-xl truncate">{task.title}</CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(task.id)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Редактировать
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(task.id)}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Удалить
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+        <CardDescription className="flex items-center gap-1.5">
+          <span className={`rounded-full w-2 h-2 ${
+            task.status === "завершена" ? "bg-green-500" :
+            task.status === "в процессе" ? "bg-amber-500" :
+            "bg-blue-500"
+          }`}></span>
+          <span className="text-muted-foreground">
+            {task.status}
+          </span>
+        </CardDescription>
       </CardHeader>
-      <CardContent className="p-4 pt-2">
-        <p className="text-sm text-muted-foreground">{task.description}</p>
-        <div className="mt-2 flex items-center text-sm text-muted-foreground">
-          <Clock className="mr-1 h-4 w-4" />
-          <span>до {task.dueDate}</span>
+      <CardContent>
+        <p className="text-sm text-muted-foreground line-clamp-2 h-10">{task.description}</p>
+        <div className="mt-4 flex items-center justify-between">
+          <Badge className={getPriorityColor(task.priority)} variant="secondary">
+            {task.priority}
+          </Badge>
+          <span className="text-xs text-muted-foreground">{task.dueDate}</span>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between p-4 pt-0">
+      <CardFooter className="flex justify-between border-t p-3 pt-4">
         <Button 
           variant="outline" 
-          size="sm" 
-          className="group transition-all"
-          onClick={() => onStatusChange(task.id, nextStatus())}
+          className="text-xs h-8 px-2"
+          onClick={() => onEdit(task.id)}
         >
-          <CheckCircle className="mr-1 h-4 w-4 group-hover:text-primary" />
-          {task.status === "завершена" ? "Сбросить" : "Изменить статус"}
+          <Pencil className="mr-1 h-3 w-3" />
+          Изменить
         </Button>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(task.id)}>
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDelete(task.id)}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="secondary" className="text-xs h-8 px-2 flex items-center gap-1">
+              <span className={getStatusColor(task.status)}>{getStatusIcon(task.status)}</span>
+              Изменить статус
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem 
+              onClick={() => onStatusChange(task.id, "новая")}
+              className={task.status === "новая" ? "bg-secondary" : ""}
+            >
+              <ClipboardList className="mr-2 h-4 w-4 text-blue-500" />
+              Новая
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onStatusChange(task.id, "в процессе")}
+              className={task.status === "в процессе" ? "bg-secondary" : ""}
+            >
+              <Clock className="mr-2 h-4 w-4 text-amber-500" />
+              В процессе
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onStatusChange(task.id, "завершена")}
+              className={task.status === "завершена" ? "bg-secondary" : ""}
+            >
+              <Check className="mr-2 h-4 w-4 text-green-500" />
+              Завершена
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
     </Card>
   );

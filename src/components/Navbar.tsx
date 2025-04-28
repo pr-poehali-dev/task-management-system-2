@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CheckSquare, Settings, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { PlusCircle, CheckSquare, Settings, LogOut, LayoutDashboard, ListTodo } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   onAddTask: () => void;
@@ -8,6 +8,7 @@ interface NavbarProps {
 
 const Navbar = ({ onAddTask }: NavbarProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
@@ -23,23 +24,58 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             <span className="text-xl font-bold">ТаскМенеджер</span>
           </Link>
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/" className="text-sm font-medium hover:text-primary">
-              Задачи
+            <Link 
+              to="/" 
+              className={`text-sm font-medium ${location.pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <div className="flex items-center gap-1">
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Дашборд</span>
+              </div>
             </Link>
-            <Link to="/settings" className="text-sm font-medium text-muted-foreground hover:text-primary">
-              Настройки
+            <Link 
+              to="/tasks" 
+              className={`text-sm font-medium ${location.pathname === '/tasks' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <div className="flex items-center gap-1">
+                <ListTodo className="h-4 w-4" />
+                <span>Задачи</span>
+              </div>
+            </Link>
+            <Link 
+              to="/settings" 
+              className={`text-sm font-medium ${location.pathname === '/settings' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <div className="flex items-center gap-1">
+                <Settings className="h-4 w-4" />
+                <span>Настройки</span>
+              </div>
             </Link>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={onAddTask} className="hidden sm:flex gap-1">
-            <PlusCircle className="h-4 w-4" />
-            Добавить задачу
-          </Button>
-          <Button onClick={onAddTask} className="sm:hidden" size="icon" variant="outline">
-            <PlusCircle className="h-4 w-4" />
-          </Button>
+          {location.pathname === '/tasks' && (
+            <>
+              <Button onClick={onAddTask} className="hidden sm:flex gap-1">
+                <PlusCircle className="h-4 w-4" />
+                Добавить задачу
+              </Button>
+              <Button onClick={onAddTask} className="sm:hidden" size="icon" variant="outline">
+                <PlusCircle className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           <div className="md:hidden flex items-center gap-2">
+            <Button asChild variant="ghost" size="icon">
+              <Link to="/">
+                <LayoutDashboard className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon">
+              <Link to="/tasks">
+                <ListTodo className="h-4 w-4" />
+              </Link>
+            </Button>
             <Button asChild variant="ghost" size="icon">
               <Link to="/settings">
                 <Settings className="h-4 w-4" />
