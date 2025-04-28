@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Check, ClipboardList, Clock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type TaskStatus = "новая" | "в процессе" | "завершена";
 export type TaskPriority = "низкий" | "средний" | "высокий";
@@ -55,7 +56,16 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => 
     <Card className="overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl truncate">{task.title}</CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardTitle className="text-xl truncate max-w-[200px]">{task.title}</CardTitle>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{task.title}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="ghost" className="h-8 w-8">
@@ -86,7 +96,16 @@ const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => 
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground line-clamp-2 h-10">{task.description}</p>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-sm text-muted-foreground line-clamp-2 h-10 cursor-help">{task.description}</p>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-sm">
+              <p>{task.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <div className="mt-4 flex items-center justify-between">
           <Badge className={getPriorityColor(task.priority)} variant="secondary">
             {task.priority}
