@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,36 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Clock, ListTodo, PieChart, TrendingUp, ArrowUpRight } from "lucide-react";
 import { Task } from "@/components/TaskCard";
 
-// Демо-данные из Index.tsx
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    title: "Разработать дизайн главной страницы",
-    description: "Создать макет и прототип главной страницы для нового проекта",
-    dueDate: "05.05.2025",
-    priority: "высокий",
-    status: "в процессе"
-  },
-  {
-    id: "2",
-    title: "Настроить базу данных",
-    description: "Установить и настроить MongoDB для нового проекта",
-    dueDate: "10.05.2025",
-    priority: "средний",
-    status: "новая"
-  },
-  {
-    id: "3",
-    title: "Написать документацию API",
-    description: "Подготовить техническую документацию по всем эндпоинтам API",
-    dueDate: "15.05.2025",
-    priority: "низкий",
-    status: "завершена"
-  }
-];
-
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [tasks, setTasks] = useState<Task[]>([]);
   
   // Проверка авторизации
   useEffect(() => {
@@ -45,11 +18,45 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
+  // Загрузка задач из localStorage
+  useEffect(() => {
+    const storedTasks = localStorage.getItem("tasks");
+    if (storedTasks) {
+      setTasks(JSON.parse(storedTasks));
+    }
+
+    // Добавляем слушатель события storage для обновления при изменениях
+    const handleStorageChange = () => {
+      const updatedTasks = localStorage.getItem("tasks");
+      if (updatedTasks) {
+        setTasks(JSON.parse(updatedTasks));
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Создаем пользовательское событие для обновления дашборда
+    const handleTaskUpdate = () => {
+      const updatedTasks = localStorage.getItem("tasks");
+      if (updatedTasks) {
+        setTasks(JSON.parse(updatedTasks));
+      }
+    };
+
+    window.addEventListener("taskUpdated", handleTaskUpdate);
+
+    // Очистка при размонтировании
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("taskUpdated", handleTaskUpdate);
+    };
+  }, []);
+
   // Получаем статистику по задачам
-  const tasksCompleted = initialTasks.filter(task => task.status === "завершена").length;
-  const tasksInProgress = initialTasks.filter(task => task.status === "в процессе").length;
-  const tasksNew = initialTasks.filter(task => task.status === "новая").length;
-  const totalTasks = initialTasks.length;
+  const tasksCompleted = tasks.filter(task => task.status === "завершена").length;
+  const tasksInProgress = tasks.filter(task => task.status === "в процессе").length;
+  const tasksNew = tasks.filter(task => task.status === "новая").length;
+  const totalTasks = tasks.length;
   
   // Процент выполнения
   const completionPercentage = totalTasks ? Math.round((tasksCompleted / totalTasks) * 100) : 0;
@@ -58,11 +65,11 @@ const Dashboard = () => {
   const lastActivity = "29 апреля 2025, 15:30";
   
   // Высший приоритет
-  const highPriorityTasks = initialTasks.filter(task => task.priority === "высокий").length;
+  const highPriorityTasks = tasks.filter(task => task.priority === "высокий").length;
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar onAddTask={() => navigate("/")} />
+      <Navbar onAddTask={() => navigate("/tasks")} />
       
       <main className="flex-1 container py-8">
         <div className="mb-8">
@@ -234,33 +241,37 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {initialTasks
-                  .sort((a, b) => {
-                    const dateA = a.dueDate.split('.').reverse().join('-');
-                    const dateB = b.dueDate.split('.').reverse().join('-');
-                    return new Date(dateA).getTime() - new Date(dateB).getTime();
-                  })
-                  .slice(0, 3)
-                  .map((task) => (
-                    <div key={task.id} className="flex items-center gap-4">
-                      <div className={`w-2 h-2 rounded-full ${
-                        task.status === "завершена" ? "bg-green-500" :
-                        task.status === "в процессе" ? "bg-amber-500" :
-                        "bg-blue-500"
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{task.title}</p>
-                        <p className="text-xs text-muted-foreground">Срок: {task.dueDate}</p>
+                {tasks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">У вас пока нет задач</p>
+                ) : (
+                  tasks
+                    .sort((a, b) => {
+                      const dateA = a.dueDate.split('.').reverse().join('-');
+                      const dateB = b.dueDate.split('.').reverse().join('-');
+                      return new Date(dateA).getTime() - new Date(dateB).getTime();
+                    })
+                    .slice(0, 3)
+                    .map((task) => (
+                      <div key={task.id} className="flex items-center gap-4">
+                        <div className={`w-2 h-2 rounded-full ${
+                          task.status === "завершена" ? "bg-green-500" :
+                          task.status === "в процессе" ? "bg-amber-500" :
+                          "bg-blue-500"
+                        }`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{task.title}</p>
+                          <p className="text-xs text-muted-foreground">Срок: {task.dueDate}</p>
+                        </div>
+                        <div className={`px-2 py-1 text-xs rounded-full ${
+                          task.priority === "высокий" ? "bg-red-100 text-red-700" :
+                          task.priority === "средний" ? "bg-amber-100 text-amber-700" :
+                          "bg-blue-100 text-blue-700"
+                        }`}>
+                          {task.priority}
+                        </div>
                       </div>
-                      <div className={`px-2 py-1 text-xs rounded-full ${
-                        task.priority === "высокий" ? "bg-red-100 text-red-700" :
-                        task.priority === "средний" ? "bg-amber-100 text-amber-700" :
-                        "bg-blue-100 text-blue-700"
-                      }`}>
-                        {task.priority}
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                )}
               </div>
             </CardContent>
           </Card>

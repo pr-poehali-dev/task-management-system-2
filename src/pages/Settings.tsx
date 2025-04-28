@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { Mail, KeyRound, Save, LogOut } from "lucide-react";
+import { Mail, KeyRound, Save } from "lucide-react";
 
 const Settings = () => {
   const [email, setEmail] = useState("user@example.com");
@@ -61,11 +61,6 @@ const Settings = () => {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    navigate("/login");
   };
 
   return (
@@ -162,24 +157,6 @@ const Settings = () => {
             </CardFooter>
           </Card>
         </div>
-        
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-500">
-              <LogOut className="h-5 w-5" />
-              Выйти из системы
-            </CardTitle>
-            <CardDescription>
-              Выход из аккаунта завершит текущую сессию
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button variant="destructive" onClick={handleLogout} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              Выйти
-            </Button>
-          </CardFooter>
-        </Card>
       </main>
     </div>
   );
