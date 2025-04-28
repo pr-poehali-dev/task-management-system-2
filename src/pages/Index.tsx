@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Task, TaskStatus } from "@/components/TaskCard";
 import Navbar from "@/components/Navbar";
 import TaskList from "@/components/TaskList";
@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 // Демо-данные
 const initialTasks: Task[] = [
@@ -60,10 +67,20 @@ const Index = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<TaskFormData>(emptyTask);
   const [isEditing, setIsEditing] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const handleAddTask = () => {
     setCurrentTask(emptyTask);
     setIsEditing(false);
+    setDate(undefined);
     setIsDialogOpen(true);
   };
 
@@ -72,6 +89,16 @@ const Index = () => {
     if (taskToEdit) {
       setCurrentTask({ ...taskToEdit });
       setIsEditing(true);
+      
+      // Parse date string to Date object
+      const dateParts = taskToEdit.dueDate.split('.');
+      if (dateParts.length === 3) {
+        const dateObject = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+        if (!isNaN(dateObject.getTime())) {
+          setDate(dateObject);
+        }
+      }
+      
       setIsDialogOpen(true);
     }
   };
@@ -89,11 +116,17 @@ const Index = () => {
   const handleSaveTask = () => {
     if (currentTask.title.trim() === "") return;
 
+    // Format the selected date
+    const formattedDate = date 
+      ? format(date, 'dd.MM.yyyy', { locale: ru }) 
+      : currentTask.dueDate;
+
     if (isEditing) {
       setTasks(tasks.map(task => 
         task.id === currentTask.id 
           ? { 
               ...currentTask, 
+              dueDate: formattedDate,
               priority: currentTask.priority as TaskPriority,
               status: currentTask.status as TaskStatus
             } 
@@ -103,6 +136,7 @@ const Index = () => {
       const newTask: Task = {
         ...currentTask,
         id: Date.now().toString(),
+        dueDate: formattedDate,
         priority: currentTask.priority as TaskPriority,
         status: currentTask.status as TaskStatus
       };
@@ -168,12 +202,29 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="dueDate">Срок выполнения</Label>
-                <Input
-                  id="dueDate"
-                  value={currentTask.dueDate}
-                  onChange={(e) => setCurrentTask({...currentTask, dueDate: e.target.value})}
-                  placeholder="ДД.ММ.ГГГГ"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="dueDate"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, 'dd.MM.yyyy', { locale: ru }) : "Выберите дату"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      locale={ru}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               
               <div className="grid gap-2">
