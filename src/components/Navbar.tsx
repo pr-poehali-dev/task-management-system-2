@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CheckSquare, Settings, LogOut, LayoutDashboard, ListTodo } from "lucide-react";
+import { PlusCircle, Settings, LogOut, LayoutDashboard, ListTodo, Trash2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
@@ -19,10 +19,6 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
     <nav className="border-b bg-background sticky top-0 z-10">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2">
-            <CheckSquare className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">ТаскМенеджер</span>
-          </Link>
           <div className="hidden md:flex items-center gap-4">
             <Link 
               to="/" 
@@ -40,6 +36,15 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
               <div className="flex items-center gap-1">
                 <ListTodo className="h-4 w-4" />
                 <span>Задачи</span>
+              </div>
+            </Link>
+            <Link 
+              to="/deleted-tasks" 
+              className={`text-sm font-medium ${location.pathname === '/deleted-tasks' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <div className="flex items-center gap-1">
+                <Trash2 className="h-4 w-4" />
+                <span>Удаленные задачи</span>
               </div>
             </Link>
             <Link 
@@ -74,6 +79,11 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             <Button asChild variant="ghost" size="icon">
               <Link to="/tasks">
                 <ListTodo className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon">
+              <Link to="/deleted-tasks">
+                <Trash2 className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="ghost" size="icon">

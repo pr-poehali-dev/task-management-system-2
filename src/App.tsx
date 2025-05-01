@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import DeletedTasks from "./pages/DeletedTasks";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/tasks" element={<Index />} />
+          <Route path="/deleted-tasks" element={<DeletedTasks />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/login" element={<Login />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

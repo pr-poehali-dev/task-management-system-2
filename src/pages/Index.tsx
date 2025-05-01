@@ -78,8 +78,18 @@ export default function Index() {
   };
 
   const deleteTask = (id: string) => {
+    // Находим задачу для удаления
+    const taskToDelete = tasks.find(task => task.id === id);
+    if (!taskToDelete) return;
+
+    // Удаляем задачу из основного списка
     const updatedTasks = tasks.filter(task => task.id !== id);
     saveTasks(updatedTasks);
+
+    // Добавляем задачу в список удаленных
+    const storedDeletedTasks = localStorage.getItem("deletedTasks");
+    const deletedTasks = storedDeletedTasks ? JSON.parse(storedDeletedTasks) : [];
+    localStorage.setItem("deletedTasks", JSON.stringify([...deletedTasks, taskToDelete]));
   };
 
   const saveTask = () => {
