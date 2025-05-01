@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Settings, LogOut, LayoutDashboard, ListTodo, Trash2 } from "lucide-react";
+import { PlusCircle, Settings, LogOut, LayoutDashboard, ListTodo, Trash2, Calendar } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
@@ -48,6 +48,15 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
               </div>
             </Link>
             <Link 
+              to="/calendar" 
+              className={`text-sm font-medium ${location.pathname === '/calendar' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            >
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>Календарь</span>
+              </div>
+            </Link>
+            <Link 
               to="/settings" 
               className={`text-sm font-medium ${location.pathname === '/settings' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
             >
@@ -84,6 +93,11 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             <Button asChild variant="ghost" size="icon">
               <Link to="/deleted-tasks">
                 <Trash2 className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon">
+              <Link to="/calendar">
+                <Calendar className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="ghost" size="icon">
