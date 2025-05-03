@@ -335,45 +335,6 @@ export default function CalendarView() {
             {view === "week" ? renderWeekView() : renderMonthView()}
           </CardContent>
         </Card>
-        
-        <div className="mt-4 md:mt-8">
-          <Card>
-            <CardHeader className="py-3 md:py-4">
-              <CardTitle className="text-lg md:text-xl">Ближайшие задачи</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 md:space-y-4">
-                {tasks.length === 0 ? (
-                  <p className="text-xs md:text-sm text-muted-foreground">У вас пока нет задач</p>
-                ) : (
-                  tasks
-                    .sort((a, b) => {
-                      const dateA = a.dueDate.split('.').reverse().join('-');
-                      const dateB = b.dueDate.split('.').reverse().join('-');
-                      return new Date(dateA).getTime() - new Date(dateB).getTime();
-                    })
-                    .slice(0, 5)
-                    .map((task) => (
-                      <div key={task.id} className="flex items-center gap-2 md:gap-4">
-                        <div className={`w-2 h-2 rounded-full ${
-                          task.status === "завершена" ? "bg-green-500" :
-                          task.status === "в процессе" ? "bg-amber-500" :
-                          "bg-blue-500"
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs md:text-sm font-medium truncate">{task.title}</p>
-                          <p className="text-[10px] md:text-xs text-muted-foreground">Срок: {task.dueDate}</p>
-                        </div>
-                        <div className={`px-1.5 py-0.5 md:px-2 md:py-1 text-[10px] md:text-xs rounded-full ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
-                        </div>
-                      </div>
-                    ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </main>
     </div>
   );
