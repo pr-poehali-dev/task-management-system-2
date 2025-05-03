@@ -14,6 +14,10 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
     localStorage.removeItem("isLoggedIn");
     navigate("/login");
   };
+
+  const getActiveClass = (path: string) => {
+    return location.pathname === path ? 'text-primary' : 'text-muted-foreground hover:text-primary';
+  };
   
   return (
     <nav className="border-b bg-background sticky top-0 z-10">
@@ -22,7 +26,7 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
           <div className="hidden md:flex items-center gap-4">
             <Link 
               to="/" 
-              className={`text-sm font-medium ${location.pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+              className={`text-sm font-medium ${getActiveClass('/')}`}
             >
               <div className="flex items-center gap-1">
                 <LayoutDashboard className="h-4 w-4" />
@@ -31,7 +35,7 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             </Link>
             <Link 
               to="/tasks" 
-              className={`text-sm font-medium ${location.pathname === '/tasks' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+              className={`text-sm font-medium ${getActiveClass('/tasks')}`}
             >
               <div className="flex items-center gap-1">
                 <ListTodo className="h-4 w-4" />
@@ -40,7 +44,7 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             </Link>
             <Link 
               to="/deleted-tasks" 
-              className={`text-sm font-medium ${location.pathname === '/deleted-tasks' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+              className={`text-sm font-medium ${getActiveClass('/deleted-tasks')}`}
             >
               <div className="flex items-center gap-1">
                 <Trash2 className="h-4 w-4" />
@@ -49,7 +53,7 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             </Link>
             <Link 
               to="/calendar" 
-              className={`text-sm font-medium ${location.pathname === '/calendar' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+              className={`text-sm font-medium ${getActiveClass('/calendar')}`}
             >
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
@@ -58,7 +62,7 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             </Link>
             <Link 
               to="/settings" 
-              className={`text-sm font-medium ${location.pathname === '/settings' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+              className={`text-sm font-medium ${getActiveClass('/settings')}`}
             >
               <div className="flex items-center gap-1">
                 <Settings className="h-4 w-4" />
@@ -80,27 +84,27 @@ const Navbar = ({ onAddTask }: NavbarProps) => {
             </>
           )}
           <div className="md:hidden flex items-center gap-2">
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className={getActiveClass('/')}>
               <Link to="/">
                 <LayoutDashboard className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className={getActiveClass('/tasks')}>
               <Link to="/tasks">
                 <ListTodo className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className={getActiveClass('/deleted-tasks')}>
               <Link to="/deleted-tasks">
                 <Trash2 className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className={getActiveClass('/calendar')}>
               <Link to="/calendar">
                 <Calendar className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className={getActiveClass('/settings')}>
               <Link to="/settings">
                 <Settings className="h-4 w-4" />
               </Link>
